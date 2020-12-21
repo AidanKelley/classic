@@ -33,6 +33,13 @@ describe('Theme plugin tests', function() {
 			year: 'numeric'
 		})
 		.split('/');
+	const user = {
+		'givenName': 'John',
+		'familyName': 'Debreenik',
+		'username': 'jdebreenik',
+		'country': 'UA',
+		'affiliation': 'Lorem Ipsum University'
+	};
 
 	it('Enables and selects the theme', function() {
 		cy.login('admin', 'admin', 'publicknowledge');
@@ -60,7 +67,7 @@ describe('Theme plugin tests', function() {
 		});
 	});
 
-	it('Search an article', function () {
+	it('Search an article', function() {
 		cy.visit(path + '/' + 'search' + '/' + 'search');
 		cy.get('input[id="query"]').type('Antimicrobial', {delay: 0});
 
@@ -77,5 +84,29 @@ describe('Theme plugin tests', function() {
 		cy.get('.search_results').children().should('have.length', 1);
 		cy.get('.article_summary').first().click();
 		cy.url().should('match', /article\/view/);
+	});
+
+	it('Register a user', function() {
+		// Sign out
+		cy.visit(path + '/' + 'login/signOut');
+		cy.url().should('match', /login/);
+
+		// Register; 'register' command won't work for this theme because privacyConsent label overlays input checkbox
+		cy.get('a.nav-link').contains('Register').click();
+		cy.url().should('match', /user\/register/);
+		cy.get('#givenName').type(user.givenName, {delay: 0});
+		cy.get('#familyName').type(user.familyName, {delay: 0});
+		cy.get('#affiliation').type(user.affiliation, {delay: 0});
+		cy.get('#country').select(user.country);
+		cy.get('#username').type(user.username, {delay: 0});
+		cy.get('#email').type(user.username + '@mailinator.com', {delay: 0});
+		cy.get('#password').type(user.username + user.username, {delay: 0});
+		cy.get('#password2').type(user.username + user.username, {delay: 0});
+		cy.get('label[for="privacyConsent"]').click();
+		cy.get('label[for="checkbox-reviewer-interests"]').click();
+		cy.get('#tagitInput input').type('psychotherapy,neuroscience,neurobiology', {delay: 0});
+		cy.get('button[type="submit"]').contains('Register').click().click(); // Cypress expects 2 clicks to submit the form
+		cy.get('.registration_complete_actions a').contains('View Submissions').click();
+		cy.url().should('match', /submissions/);
 	});
 });
