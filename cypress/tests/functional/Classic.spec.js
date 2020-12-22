@@ -11,21 +11,6 @@ describe('Theme plugin tests', function() {
 	const journalPath = 'publicknowledge';
 	const index = 'index.php';
 	const path = '/' + index + '/' + journalPath;
-	const pages = [
-		'issue/current',
-		'issue/archive',
-		'issue/view/1',
-		'article/view/17',
-		'article/view/17/3',
-		'about',
-		'about/editorialTeam',
-		'about/submissions',
-		'about/contact',
-		'about/privacy',
-		'information/readers',
-		'information/authors',
-		'information/librarians'
-	];
 	const [month, day, year] = new Date()
 		.toLocaleDateString('en-US', {
 			month: 'numeric',
@@ -61,9 +46,19 @@ describe('Theme plugin tests', function() {
 
 	it('Visits front-end theme pages', function() {
 		cy.visit(' ');
-		pages.forEach(page => {
-			cy.visit(path + '/' + page);
-		});
+		cy.visit(path + '/issue/current');
+		cy.visit(path + '/issue/archive');
+		cy.visit(path + '/issue/view/1');
+		cy.visit(path + '/article/view/17');
+		cy.visit(path + '/article/view/17/3');
+		cy.visit(path + '/about');
+		cy.visit(path + '/about/editorialTeam');
+		cy.visit(path + '/about/submissions');
+		cy.visit(path + '/about/contact');
+		cy.visit(path + '/about/privacy');
+		cy.visit(path + '/information/readers');
+		cy.visit(path + '/information/authors');
+		cy.visit(path + '/information/librarians');
 	});
 
 	it('Search an article', function() {
