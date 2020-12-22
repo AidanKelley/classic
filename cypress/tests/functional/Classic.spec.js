@@ -29,7 +29,7 @@ describe('Theme plugin tests', function() {
 	it('Enables and selects the theme', function() {
 		cy.login('admin', 'admin', 'publicknowledge');
 
-		cy.get('nav[class="app__nav"] ul a[class="app__navItem"]:contains("Website")').click();
+		cy.get('.app__nav a').contains('Website').click();
 		cy.get('button[id="plugins-button"]').click();
 
 		// Find and enable the plugin
@@ -40,8 +40,8 @@ describe('Theme plugin tests', function() {
 		// Select the Classic theme
 		cy.get('button[id="appearance-button"]').click();
 		cy.get('select[id="theme-themePluginPath-control"]').select('classic');
-		cy.get('div[id="theme"] button').contains('Save').click();
-		cy.get('div[id="theme"] [role="status"]').contains('Saved');
+		cy.get('#theme button').contains('Save').click();
+		cy.get('#theme [role="status"]').contains('Saved');
 	});
 
 	it('Visits front-end theme pages', function() {
@@ -85,7 +85,7 @@ describe('Theme plugin tests', function() {
 		cy.visit(path + '/' + 'login/signOut');
 		cy.url().should('match', /login/);
 
-		// Register; 'register' command won't work for this theme because privacyConsent label overlays input checkbox
+		// Register; 'cy.register()' command won't work for this theme because privacyConsent label overlays input checkbox
 		cy.get('a.nav-link').contains('Register').click();
 		cy.url().should('match', /user\/register/);
 		cy.get('#givenName').type(user.givenName, {delay: 0});
