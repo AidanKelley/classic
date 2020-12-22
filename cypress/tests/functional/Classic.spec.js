@@ -61,7 +61,6 @@ describe('Theme plugin tests', function() {
 
 	it('Visits front-end theme pages', function() {
 		cy.visit(' ');
-		cy.url().should('match',/index/);
 		pages.forEach(page => {
 			cy.visit(path + '/' + page);
 		});
@@ -107,6 +106,16 @@ describe('Theme plugin tests', function() {
 		cy.get('#tagitInput input').type('psychotherapy,neuroscience,neurobiology', {delay: 0});
 		cy.get('button[type="submit"]').contains('Register').click().click(); // Cypress expects 2 clicks to submit the form
 		cy.get('.registration_complete_actions a').contains('View Submissions').click();
+		cy.url().should('match', /submissions/);
+	});
+
+	it('Log in/Log out', function() {
+		// Sign out
+		cy.visit(path + '/' + 'login/signOut');
+		cy.url().should('match', /login/);
+		cy.get('#username').type(user.username, {delay: 0});
+		cy.get('#password').type(user.username + user.username);
+		cy.get('button[type="submit"]').click();
 		cy.url().should('match', /submissions/);
 	});
 });
