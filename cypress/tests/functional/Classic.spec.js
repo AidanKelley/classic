@@ -49,8 +49,8 @@ describe('Theme plugin tests', function() {
 		cy.visit(path + '/issue/current');
 		cy.visit(path + '/issue/archive');
 		cy.visit(path + '/issue/view/1');
-		cy.visit(path + '/article/view/17');
-		cy.visit(path + '/article/view/17/3');
+		cy.visit(path + '/article/view/1');
+		cy.visit(path + '/article/view/1/1');
 		cy.visit(path + '/about');
 		cy.visit(path + '/about/editorialTeam');
 		cy.visit(path + '/about/submissions');
@@ -77,17 +77,19 @@ describe('Theme plugin tests', function() {
 		cy.get('button[type="submit"]').click();
 		cy.get('.search_results').children().should('have.length', 1);
 		cy.get('.article_summary').first().click();
-		cy.url().should('match', /article\/view/);
+		cy.get('.article-full-title').contains(
+			'Antimicrobial, heavy metal resistance and plasmid profile of coliforms isolated from nosocomial infections in a hospital in Isfahan, Iran'
+		);
 	});
 
 	it('Register a user', function() {
 		// Sign out
 		cy.visit(path + '/' + 'login/signOut');
-		cy.url().should('match', /login/);
+		cy.url().should('include', 'login');
 
 		// Register; 'cy.register()' command won't work for this theme because privacyConsent label overlays input checkbox
 		cy.get('a.nav-link').contains('Register').click();
-		cy.url().should('match', /user\/register/);
+		cy.url().should('include', '/user/register');
 		cy.get('#givenName').type(user.givenName, {delay: 0});
 		cy.get('#familyName').type(user.familyName, {delay: 0});
 		cy.get('#affiliation').type(user.affiliation, {delay: 0});
@@ -101,16 +103,16 @@ describe('Theme plugin tests', function() {
 		cy.get('#tagitInput input').type('psychotherapy,neuroscience,neurobiology', {delay: 0});
 		cy.get('button[type="submit"]').contains('Register').click().click(); // Cypress expects 2 clicks to submit the form
 		cy.get('.registration_complete_actions a').contains('View Submissions').click();
-		cy.url().should('match', /submissions/);
+		cy.url().should('include', 'submissions');
 	});
 
 	it('Log in/Log out', function() {
 		// Sign out
 		cy.visit(path + '/' + 'login/signOut');
-		cy.url().should('match', /login/);
+		cy.url().should('include', 'login');
 		cy.get('#username').type(user.username, {delay: 0});
 		cy.get('#password').type(user.username + user.username);
 		cy.get('button[type="submit"]').click();
-		cy.url().should('match', /submissions/);
+		cy.url().should('include', 'submissions');
 	});
 });
