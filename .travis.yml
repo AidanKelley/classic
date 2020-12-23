@@ -31,4 +31,4 @@ install:
   - $(npm bin)/cypress run --spec "cypress/tests/data/*.spec.js,cypress/tests/data/60-content/VkarbasizaedSubmission.spec.js"
 
 script:
-  - $(npm bin)/cypress run --config integrationFolder=plugins/themes/classic/cypress/tests/functional
+  - $(npm bin)/cypress run --config integrationFolder=plugins/themes/classic/cypress/tests/functional,nodeVersion=system

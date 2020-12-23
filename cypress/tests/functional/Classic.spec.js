@@ -25,6 +25,7 @@ describe('Theme plugin tests', function() {
 		'country': 'UA',
 		'affiliation': 'Lorem Ipsum University'
 	};
+	const journalDescription = 'Sed elementum ligula sit amet velit gravida fermentum. Ut mi risus, dapibus nec tincidunt eget, tincidunt eget nulla.';
 
 	it('Enables and selects the theme', function() {
 		cy.login('admin', 'admin', 'publicknowledge');
@@ -59,6 +60,29 @@ describe('Theme plugin tests', function() {
 		cy.visit(path + '/information/readers');
 		cy.visit(path + '/information/authors');
 		cy.visit(path + '/information/librarians');
+	});
+
+	it('Checks theme options', function() {
+		cy.login('admin', 'admin', journalPath);
+		cy.visit(path + '/management/settings/website');
+		cy.get('#appearance-button').click();
+		cy.get('#theme-button').click();
+		cy.get('input.vc-input__input').first().clear().type('#AAAAAA');
+		cy.get(".pkpFormField--options__optionLabel").contains('Show on the journal\'s homepage.').click();
+		cy.get('#theme button').contains('Save').click();
+		cy.get('#theme [role="status"]').contains('Saved');
+
+		// Populate journal summary
+		cy.get('.app__navItem').contains('Journal').click();
+		cy.get('#masthead-button').click();
+		cy.get('#masthead-description-control-en_US').type(journalDescription);
+		cy.get('#masthead button').contains('Save').click();
+		cy.get('#masthead [role="status"]').contains('Saved');
+
+		// Check if applied
+		cy.get('header a').contains('Journal of Public Knowledge').click();
+		cy.get('.site-footer').should('have.css', 'background-color', 'rgb(170, 170, 170)');
+		cy.get('.journal_summary').contains(journalDescription);
 	});
 
 	it('Search an article', function() {
