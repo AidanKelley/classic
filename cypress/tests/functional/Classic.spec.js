@@ -26,6 +26,7 @@ describe('Theme plugin tests', function() {
 		'affiliation': 'Lorem Ipsum University'
 	};
 	const journalDescription = 'Sed elementum ligula sit amet velit gravida fermentum. Ut mi risus, dapibus nec tincidunt eget, tincidunt eget nulla.';
+	const categoryDescription = 'Maecenas imperdiet sodales ligula et tempor. Phasellus urna sem, efficitur sed nisi egestas, lacinia elementum quam.';
 
 	it('Enables and selects the theme', function() {
 		cy.login('admin', 'admin', 'publicknowledge');
@@ -83,6 +84,51 @@ describe('Theme plugin tests', function() {
 		cy.get('header a').contains('Journal of Public Knowledge').click();
 		cy.get('.site-footer').should('have.css', 'background-color', 'rgb(170, 170, 170)');
 		cy.get('.journal_summary').contains(journalDescription);
+	});
+
+	it('Checks category pages & publication versioning', function() {
+		cy.login('admin', 'admin', journalPath);
+		cy.visit(path + '/management/settings/context#categories');
+		cy.get('#categoriesContainer a').contains('Add Category').click();
+		cy.wait(2000);
+		cy.get('input[name="name[en_US]"]').type('First category', {delay: 0});
+		cy.get('input[name="path"]').type('first-category', {delay: 0});
+		cy.get('textarea[name="description[en_US]"]').then(node => {
+			cy.setTinyMceContent(node.attr('id'), categoryDescription);
+		});
+		cy.get('#categoryDetails [id^="submitFormButton"]').click();
+		cy.visit(path + '/workflow/index/1/5#publication');
+		cy.get('.pkpButton').contains('Create New Version').click();
+		cy.get('#modals-container .pkpButton').contains('Yes').click();
+		cy.wait(2000); // wait for a new version init
+
+		cy.get('#issue-button').click();
+		cy.get('.pkpFormField--options__optionLabel').contains('First category').click();
+		cy.get('#issue button').contains('Save').click();
+		cy.get('#issue [role="status"]').contains('Saved');
+
+		cy.get('#titleAbstract-button').click();
+		cy.get('#titleAbstract-title-control-en_US').type(' - version 2');
+		cy.get('#titleAbstract .pkpButton').contains('Save').click();
+		cy.get('#titleAbstract [role="status"]').contains('Saved');
+		cy.get('#publication .pkpButton').contains('Publish').click();
+		cy.get('.pkp_modal .pkpButton').contains('Publish').click();
+		cy.wait(2000);
+
+		// Visit front-end pages
+		cy.visit(path + '/article/view/1');
+		cy.get('.article-full-title').invoke('text').then((text) => {
+			expect(text).to.include('version 2');
+		});
+		cy.get('h3').contains('Versions').next('ul').children().should('have.length', 2);
+		cy.visit(path + '/article/view/1/version/1');
+		cy.get('.article-full-title').invoke('text').then((text) => {
+			expect(text).not.to.include('version 2');
+		});
+		cy.visit(path + '/article/view/1/version/1/1');
+		cy.visit(path + '/catalog/category/first-category');
+		cy.get('.article_count').contains('1 Items');
+		cy.get('.cmp_article_list.articles').children().should('have.length', 1);
 	});
 
 	it('Search an article', function() {
